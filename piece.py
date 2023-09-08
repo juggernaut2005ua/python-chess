@@ -59,6 +59,40 @@ class Pawn(Piece):
         else:
             return "images/blackPawn.png"
         
+    def is_valid_move(self, piece_to_move, new_col, new_row):
+        current_col, current_row = piece_to_move.get_piece_coordinates()
+        piece_color = piece_to_move.get_color()
+
+        for piece, (col, row) in self.pieces.items():
+            # Перевірте, чи цільовий квадрат зайнятий іншою фігурою того ж кольору.
+            if col == new_col and row == new_row and piece.get_color() == piece_color:
+                return False
+
+            # Перевірка правил для пішака (один або два квадрати вперед і захоплення по діагоналі).
+            if piece.get_type() == "Pawn":
+                if piece_color == "white":
+                    if (col == new_col and row == current_row + 1) or (col == new_col and row == current_row - 1):
+                        return False
+                    if current_row == 1 and (new_col, new_row) == (current_col, current_row + 2):
+                        return False
+                else:
+                    if (col == new_col and row == current_row - 1) or (col == new_col and row == current_row + 1):
+                        return False
+                    if current_row == 6 and (new_col, new_row) == (current_col, current_row - 2):
+                        return False
+
+        # Якщо жодна з умов вище не виконується, хід вважається допустимим.
+        return True
+
+    def move_piece(self, piece_to_move, new_col, new_row):
+        # Проверяем, допустим ли такой ход
+        if piece_to_move.is_valid_move(self, new_col, new_row):
+            # Выполняем перемещение фигуры
+            piece_to_move.move(self, new_col, new_row)
+            return True
+        else:
+            return False
+
 
 
 class Knight(Piece):

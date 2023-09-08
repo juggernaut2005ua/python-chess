@@ -1,6 +1,6 @@
 import functools
 from tkinter import Button, Canvas, PhotoImage
-from piece import Piece
+from piece import Pawn, King, Knight, Bishop, Rook, Queen, Piece
 
 
 class ChessBoardGUI:
@@ -13,6 +13,7 @@ class ChessBoardGUI:
         self.active_images = []
         self.selected_piece = None
         self.current_player = "white"
+        self.pieces = {}
 
         self.board_gui = None
 
@@ -87,6 +88,124 @@ class ChessBoardGUI:
             print("No piece on this square")
 
         return piece
+    
+    def is_valid_move(self, piece_to_move, new_col, new_row):
+        for piece, (col, row) in self.pieces.items():
+            if col == new_col and row == new_row:
+                return False
+        
+        piece_type = piece_to_move.get_type()
+        current_row, current_col = piece_to_move.get_piece_coordinates()
+        piece_color = piece_to_move.get_color()
+
+        if piece_type == "Queen":
+            # Проверка вертикальных и горизонтальных ходов, аналогично ладье
+            if current_col == new_col or current_row == new_row:
+                # Проверка наличия фигур на пути
+                if current_col == new_col:
+                    min_row, max_row = min(current_row, new_row), max(current_row, new_row)
+                    for row in range(min_row + 1, max_row):
+                        if self.get_piece_at(row, current_col):
+                            return False
+                else:
+                    min_col, max_col = min(current_col, new_col), max(current_col, new_col)
+                    for col in range(min_col + 1, max_col):
+                        if self.get_piece_at(current_row, col):
+                            return False
+            # Проверка диагональных ходов, аналогично слону
+            elif abs(current_col - new_col) == abs(current_row - new_row):
+                col_step = 1 if new_col > current_col else -1
+                row_step = 1 if new_row > current_row else -1
+                col, row = current_col + col_step, current_row + row_step
+                while col != new_col:
+                    if self.get_piece_at(row, col):
+                        return False
+                    col += col_step
+                    row += row_step
+            else:
+                return False
+        elif piece_type == "Rook":
+            if current_col == new_col or current_row == new_row:
+                # Проверка наличия фигур на пути
+                if current_col == new_col:
+                    min_row, max_row = min(current_row, new_row), max(current_row, new_row)
+                    for row in range(min_row + 1, max_row):
+                        if self.get_piece_at(row, current_col):
+                            return False
+                else:
+                    min_col, max_col = min(current_col, new_col), max(current_col, new_col)
+                    for col in range(min_col + 1, max_col):
+                        if self.get_piece_at(current_row, col):
+                            return False
+        elif piece_type == "Bishop":
+            if abs(current_col - new_col) == abs(current_row - new_row):
+                col_step = 1 if new_col > current_col else -1
+                row_step = 1 if new_row > current_row else -1
+                col, row = current_col + col_step, current_row + row_step
+                while col != new_col:
+                    if self.get_piece_at(row, col):
+                        return False
+                    col += col_step
+                    row += row_step
+            else:
+                return False
+            
+        elif piece_type == "Pawn":
+            if piece_color == "white":
+                for other_piece, (col, row) in self.pieces.items():
+                    if col == new_col and row == current_row + 1:
+                        return False
+            for other_piece, (col, row) in self.pieces.items():
+                if col == new_col and row == current_row - 1:
+                    return False
+                
+        elif piece_type == "Knight":
+            moves = [
+            (current_col + 1, current_row - 2), (current_col + 2, current_row - 1),
+            (current_col + 2, current_row + 1), (current_col + 1, current_row + 2),
+            (current_col - 1, current_row + 2), (current_col - 2, current_row + 1),
+            (current_col - 2, current_row - 1), (current_col - 1, current_row - 2)
+            ]
+        # Проверяем, является ли новая позиция одной из возможных позиций коня
+            if (new_col, new_row) in moves:
+                return True
+        elif piece_type == "King":
+            # Проверка возможных ходов короля
+            moves = [
+                (current_col, current_row - 1), (current_col + 1, current_row - 1),
+                (current_col + 1, current_row), (current_col + 1, current_row + 1),
+                (current_col, current_row + 1), (current_col - 1, current_row + 1),
+                (current_col - 1, current_row), (current_col - 1, current_row - 1)
+            ]
+            if (new_col, new_row) in moves:
+                return True
+            return False
+        
+        return True
+    
+    def move(self, board_logic, new_col, new_row):
+        # Ваша логика проверки допустимости хода
+        if self.is_valid_move(board_logic, new_col, new_row):
+            # Переместить фигуру на новую позицию
+            self.set_position(new_col, new_row)
+            return True
+        else:
+            return False
+        
+    def set_position(self, new_col, new_row):
+        # Установите новые координаты фигуры
+        self.col = new_col
+        self.row = new_row
+
+    
+    def move_piece(self, piece_to_move, new_col, new_row):
+        # Проверяем, допустим ли такой ход
+        if piece_to_move.is_valid_move(self, new_col, new_row):
+            # Выполняем перемещение фигуры
+            piece_to_move.move(self, new_col, new_row)
+            return True
+        else:
+            return False
 
     def update_board_visuals(self):
         # Создать словарь для хранения объектов PhotoImage по пути к изображению
