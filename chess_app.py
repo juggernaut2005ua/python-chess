@@ -1,7 +1,6 @@
 from tkinter import Tk
 from logic import GameLogic
 from board import ChessBoardGUI
-from piece import Piece
 
 if __name__ == "__main__":
     root = Tk()

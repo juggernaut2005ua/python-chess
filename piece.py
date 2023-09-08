@@ -257,6 +257,5 @@ class King(Piece):
             return "images/blackKing.png"
 
 
-
 test = Piece("white",1,1)
 print(test.get_color())

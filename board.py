@@ -1,9 +1,9 @@
-
 from tkinter import Button, Canvas, PhotoImage
 from piece import Pawn, King, Knight, Bishop, Rook, Queen, Piece
 
 
 class ChessBoardGUI:
+
     def __init__(self, root, board_logic):
         self.root = root
         self.root.title("Chess Board")
@@ -27,15 +27,18 @@ class ChessBoardGUI:
         self.initialize_board_buttons()
         print("Selected piece -",self.selected_piece)
 
+
     def piece_clicked(self, event, piece):
         if self.selected_piece is None:
             # Если еще не выбрана фигура, выберите ее
             self.selected_piece = piece
+            print("selected piece -", self.selected_piece)
         else:
             # Если уже выбрана фигура
             if piece and piece.get_color() == self.selected_piece.get_color():
                 # Если выбрана фигура того же цвета, перезапишите выбранную фигуру
                 self.selected_piece = piece
+                print("selected piece -", self.selected_piece)
             elif piece:
                 # Если выбрана фигура другого цвета, выполните ход
                 target_coordinates = piece.get_piece_coordinates()
@@ -43,6 +46,7 @@ class ChessBoardGUI:
                     # Фигура перемещена на целевые координаты
                     self.selected_piece = None
                     self.current_player = "black" if self.current_player == "white" else "white"
+                    print("selected piece -", self.selected_piece)
                 else:
                     # Обработайте недопустимый ход (по желанию)
                     print("Invalid move")
@@ -54,8 +58,10 @@ class ChessBoardGUI:
                 else:
                     # Обработайте недопустимый ход (по желанию)
                     print("Invalid move")
+                    print("selected piece -", self.selected_piece)
 
         self.update_board_visuals()
+
 
     def initialize_board(self):
             # Расставляем начальные фигуры на доске
@@ -84,6 +90,7 @@ class ChessBoardGUI:
             self.add_piece(Queen("white",7,3),7,3)
             self.add_piece(Queen("black",0,3),0,3)
 
+
     def initialize_board_buttons(self):
         size = 50
 
@@ -93,8 +100,7 @@ class ChessBoardGUI:
                 x1, y1 = size * j, size * i
                 color = "#C0C0C0" if (i + j) % 2 == 0 else "#808080"
                 piece = self.get_piece_at(i, j)
-                
-                
+                                
                 def click_handler(event, i=i, j=j):
                     return self.piece_clicked(event, self.get_piece_at(i, j))
                 
@@ -118,6 +124,7 @@ class ChessBoardGUI:
 
         return piece
     
+
     def is_valid_move(self, piece_to_move, new_col, new_row):
         for piece, (col, row) in self.pieces.items():
             if col == new_col and row == new_row:
@@ -254,6 +261,7 @@ class ChessBoardGUI:
         else:
             return False
 
+
     def update_board_visuals(self):
         # Создать словарь для хранения объектов PhotoImage по пути к изображению
         image_cache = {}
@@ -279,6 +287,3 @@ class ChessBoardGUI:
 
         # Обновить все кнопки
         self.root.update()
-
-
-
