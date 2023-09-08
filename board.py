@@ -42,7 +42,7 @@ class ChessBoardGUI:
             elif piece:
                 # Если выбрана фигура другого цвета, выполните ход
                 target_coordinates = piece.get_piece_coordinates()
-                if self.selected_piece.move_piece(target_coordinates[0], target_coordinates[1]):
+                if self.selected_piece.move_piece(self,target_coordinates[0], target_coordinates[1]):
                     # Фигура перемещена на целевые координаты
                     self.selected_piece = None
                     self.current_player = "black" if self.current_player == "white" else "white"
