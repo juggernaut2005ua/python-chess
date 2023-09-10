@@ -1,4 +1,4 @@
-from tkinter import Button, Canvas, PhotoImage
+from tkinter import Button, Canvas, PhotoImage, Tk
 from piece import Pawn, King, Knight, Bishop, Rook, Queen, Piece
 
 
@@ -28,39 +28,65 @@ class ChessBoardGUI:
         print("Selected piece -",self.selected_piece)
 
 
+    # def piece_clicked(self, event, piece):
+    #     if self.selected_piece is None:
+    #         # Если еще не выбрана фигура, выберите ее
+    #         self.selected_piece = piece
+    #         print("selected piece -", self.selected_piece)
+    #     else:
+    #         # Если уже выбрана фигура
+    #         if piece and piece.get_color() == self.selected_piece.get_color():
+    #             # Если выбрана фигура того же цвета, перезапишите выбранную фигуру
+    #             self.selected_piece = piece
+    #             print("selected piece -", self.selected_piece)
+    #         elif piece:
+    #             # Если выбрана фигура другого цвета, выполните ход
+    #             target_coordinates = piece.get_piece_coordinates()
+    #             if self.selected_piece.move_piece(self,target_coordinates[0], target_coordinates[1]):
+    #                 # Фигура перемещена на целевые координаты
+    #                 self.selected_piece = None
+    #                 self.current_player = "black" if self.current_player == "white" else "white"
+    #                 print("selected piece -", self.selected_piece)
+    #             else:
+    #                 # Обработайте недопустимый ход (по желанию)
+    #                 print("Invalid move")
+    #         else:
+    #             # Если нажата пустая клетка, обновите координаты выбранной фигуры
+    #             target_coordinates = self.selected_piece.get_piece_coordinates()
+    #             if self.selected_piece.move_piece(self, target_coordinates[0], target_coordinates[1]):
+    #                 self.selected_piece = None
+    #             else:
+    #                 # Обработайте недопустимый ход (по желанию)
+    #                 print("Invalid move")
+    #                 print("selected piece -", self.selected_piece)
+
+    #     self.update_board_visuals()
+
     def piece_clicked(self, event, piece):
         if self.selected_piece is None:
-            # Если еще не выбрана фигура, выберите ее
-            self.selected_piece = piece
-            print("selected piece -", self.selected_piece)
-        else:
-            # Если уже выбрана фигура
-            if piece and piece.get_color() == self.selected_piece.get_color():
-                # Если выбрана фигура того же цвета, перезапишите выбранную фигуру
+            if piece and piece.get_color() == self.current_player:
                 self.selected_piece = piece
-                print("selected piece -", self.selected_piece)
-            elif piece:
-                # Если выбрана фигура другого цвета, выполните ход
+                print("Selected piece -", self.selected_piece.get_type())
+            else:
+                print("Invalid selection")
+        elif piece and piece.get_color() == self.selected_piece.get_color():
+            self.selected_piece = piece
+            print("Selected piece -", self.selected_piece.get_type())
+        elif self.selected_piece == piece:
+            self.selected_piece = None
+            print("Selected piece - None")
+        else:
+            if piece is not None:
                 target_coordinates = piece.get_piece_coordinates()
-                if self.selected_piece.move_piece(self,target_coordinates[0], target_coordinates[1]):
-                    # Фигура перемещена на целевые координаты
+                if self.selected_piece.move(self, target_coordinates[0], target_coordinates[1]):
                     self.selected_piece = None
                     self.current_player = "black" if self.current_player == "white" else "white"
-                    print("selected piece -", self.selected_piece)
+                    print("Selected piece - None")
                 else:
-                    # Обработайте недопустимый ход (по желанию)
                     print("Invalid move")
-            else:
-                # Если нажата пустая клетка, обновите координаты выбранной фигуры
-                target_coordinates = self.selected_piece.get_piece_coordinates()
-                if self.selected_piece.move_piece(self, target_coordinates[0], target_coordinates[1]):
-                    self.selected_piece = None
-                else:
-                    # Обработайте недопустимый ход (по желанию)
-                    print("Invalid move")
-                    print("selected piece -", self.selected_piece)
-
         self.update_board_visuals()
+
+
 
 
     def initialize_board(self):
@@ -101,12 +127,13 @@ class ChessBoardGUI:
                 color = "#C0C0C0" if (i + j) % 2 == 0 else "#808080"
                 piece = self.get_piece_at(i, j)
                                 
-                def click_handler(event, i=i, j=j):
-                    return self.piece_clicked(event, self.get_piece_at(i, j))
+                # def click_handler(event, i=i, j=j):
+                #     return self.piece_clicked(event, self.get_piece_at(i, j))
                 
                 button = Button(master=self.canvas, text="", bg=color)
                 button.place(x=x1, y=y1, width=size, height=size)
-                button.bind("<Button-1>", click_handler)
+                button.bind("<Button-1>", lambda event, i=i, j=j : self.piece_clicked
+                            (event, self.get_piece_at(i, j)))
                 row_buttons.append(button)
             self.buttons.append(row_buttons)
 
@@ -252,38 +279,67 @@ class ChessBoardGUI:
         self.board[row][col] = piece
 
     
-    def move_piece(self, piece_to_move, new_col, new_row):
-        # Проверяем, допустим ли такой ход
-        if piece_to_move.is_valid_move(self, new_col, new_row):
-            # Выполняем перемещение фигуры
-            piece_to_move.move(self, new_col, new_row)
-            return True
-        else:
-            return False
+    # def move_piece(self, piece_to_move, new_col, new_row):
+    #     # Проверяем, допустим ли такой ход
+    #     if piece_to_move.is_valid_move(self, new_col, new_row):
+    #         # Выполняем перемещение фигуры
+    #         piece_to_move.move(self, new_col, new_row)
+    #         return True
+    #     else:
+    #         return False
 
+
+    # def update_board_visuals(self):
+    #     # Создать словарь для хранения объектов PhotoImage по пути к изображению
+    #     image_cache = {}
+        
+    #     for i in range(8):
+    #         for j in range(8):
+    #             piece = self.get_piece_at(i, j)
+    #             if piece:
+    #                 image_path = piece.get_image_path()
+                    
+    #                 # Попробовать получить изображение из кеша
+    #                 if image_path in image_cache:
+    #                     image = image_cache[image_path]
+    #                 else:
+    #                     # Если изображение ещё не в кеше, создать его и добавить в кеш
+    #                     image = PhotoImage(file=image_path)
+    #                     image_cache[image_path] = image
+                    
+    #                 self.buttons[i][j].config(image=image, text="", borderwidth=0)
+    #                 self.buttons[i][j].image = image
+    #             else:
+    #                 self.buttons[i][j].config(image="", text="", borderwidth=0)
+
+    #     # Обновить все кнопки
+    #     self.root.update()
 
     def update_board_visuals(self):
-        # Создать словарь для хранения объектов PhotoImage по пути к изображению
-        image_cache = {}
-        
-        for i in range(8):
-            for j in range(8):
-                piece = self.get_piece_at(i, j)
-                if piece:
-                    image_path = piece.get_image_path()
-                    
-                    # Попробовать получить изображение из кеша
-                    if image_path in image_cache:
-                        image = image_cache[image_path]
-                    else:
-                        # Если изображение ещё не в кеше, создать его и добавить в кеш
-                        image = PhotoImage(file=image_path)
-                        image_cache[image_path] = image
-                    
-                    self.buttons[i][j].config(image=image, text="", borderwidth=0)
-                    self.buttons[i][j].image = image
-                else:
-                    self.buttons[i][j].config(image="", text="", borderwidth=0)
+        size = 50
 
-        # Обновить все кнопки
-        self.root.update()
+        for i in range(8):
+            row_buttons = []
+            for j in range(8):
+                x1, y1 = size * j, size * i
+                color = "#C0C0C0" if (i + j) % 2 == 0 else "#808080"
+                piece = self.get_piece_at(i, j)
+                image_path = None  # Початкове значення для шляху зображення
+
+                if piece:
+                    image_path = piece.get_image_path()  # Отримати шлях до зображення для фігури
+
+                button = Button(master=self.canvas, text="", bg=color)
+                button.place(x=x1, y=y1, width=size, height=size)
+
+                if image_path:
+                    # Якщо є шлях до зображення, завантажте його і встановіть на кнопку
+                    image = PhotoImage(file=image_path)
+                    button.config(image=image)
+                    button.image = image  # Збережіть посилання на зображення, щоб воно не було очищено сміттям
+
+                # Прив'яжіть обробник кліку до кнопки
+                button.bind("<Button-1>", lambda event, i=i, j=j: self.piece_clicked(event, self.get_piece_at(i, j)))
+                row_buttons.append(button)
+            self.buttons.append(row_buttons)
+    
