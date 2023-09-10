@@ -14,7 +14,6 @@ class ChessBoardGUI:
         self.selected_piece = None
         self.current_player = "white"
         self.pieces = {}
-        self.pieces = {}
         self.board = [[None for _ in range(8)] for _ in range(8)] # двухмерный массив
         # self.board_gui = board_guis
         self.current_player = "white"
@@ -62,6 +61,15 @@ class ChessBoardGUI:
 
     #     self.update_board_visuals()
 
+    def find_empty_cells(self):
+        empty_cells = []
+        for row in range(8):
+            for col in range(8):
+                if self.get_piece_at(row, col) is None:
+                    empty_cells.append((row, col))
+        return empty_cells
+    
+
     def piece_clicked(self, event, piece):
         if self.selected_piece is None:
             if piece and piece.get_color() == self.current_player:
@@ -76,14 +84,18 @@ class ChessBoardGUI:
             self.selected_piece = None
             print("Selected piece - None")
         else:
-            if piece is not None:
-                target_coordinates = piece.get_piece_coordinates()
-                if self.selected_piece.move(self, target_coordinates[0], target_coordinates[1]):
-                    self.selected_piece = None
-                    self.current_player = "black" if self.current_player == "white" else "white"
-                    print("Selected piece - None")
+            if piece is None:
+                target_coordinates = self.find_empty_cells()
+                if target_coordinates:
+                    print(target_coordinates)
+                    if self.selected_piece.move(self, target_coordinates[0], target_coordinates[1]):
+                        self.selected_piece = None
+                        self.current_player = "black" if self.current_player == "white" else "white"
+                        print("Selected piece - None")
+                    else:
+                        print("Invalid move")
                 else:
-                    print("Invalid move")
+                    print("No empty cells available.")
         self.update_board_visuals()
 
 
@@ -92,29 +104,29 @@ class ChessBoardGUI:
     def initialize_board(self):
             # Расставляем начальные фигуры на доске
             for i in range(8):
-                self.add_piece(Pawn("black", 1, i), 1, i)
-                self.add_piece(Pawn("white",6,i),6, i)
+                self.add_piece(Pawn("black", 1, i,self), 1, i)
+                self.add_piece(Pawn("white",6,i,self),6, i)
             #Rook
-            self.add_piece(Rook("black", 0, 0), 0, 0)
-            self.add_piece(Rook("black", 0, 7), 0, 7)
-            self.add_piece(Rook("white", 7, 0), 7, 0)
-            self.add_piece(Rook("white", 7, 7), 7, 7)
+            self.add_piece(Rook("black", 0, 0,self), 0, 0)
+            self.add_piece(Rook("black", 0, 7,self), 0, 7)
+            self.add_piece(Rook("white", 7, 0,self), 7, 0)
+            self.add_piece(Rook("white", 7, 7,self), 7, 7)
             #Bishop
-            self.add_piece(Bishop("black",0,2),0,2)
-            self.add_piece(Bishop("black",0,5),0,5)
-            self.add_piece(Bishop("white",7,2),7,2)
-            self.add_piece(Bishop("white",7,5),7,5)
+            self.add_piece(Bishop("black",0,2,self),0,2)
+            self.add_piece(Bishop("black",0,5,self),0,5)
+            self.add_piece(Bishop("white",7,2,self),7,2)
+            self.add_piece(Bishop("white",7,5,self),7,5)
             #Knight
-            self.add_piece(Knight("black",0,1),0,1)
-            self.add_piece(Knight("black",0,6),0,6)
-            self.add_piece(Knight("white",7,1),7,1)
-            self.add_piece(Knight("white",7,6),7,6)
+            self.add_piece(Knight("black",0,1,self),0,1)
+            self.add_piece(Knight("black",0,6,self),0,6)
+            self.add_piece(Knight("white",7,1,self),7,1)
+            self.add_piece(Knight("white",7,6,self),7,6)
             #King
-            self.add_piece(King("white",7,4),7,4)
-            self.add_piece(King("black",0,4),0,4)
+            self.add_piece(King("white",7,4,self),7,4)
+            self.add_piece(King("black",0,4,self),0,4)
             # Queens
-            self.add_piece(Queen("white",7,3),7,3)
-            self.add_piece(Queen("black",0,3),0,3)
+            self.add_piece(Queen("white",7,3,self),7,3)
+            self.add_piece(Queen("black",0,3,self),0,3)
 
 
     def initialize_board_buttons(self):
@@ -343,3 +355,4 @@ class ChessBoardGUI:
                 row_buttons.append(button)
             self.buttons.append(row_buttons)
     
+

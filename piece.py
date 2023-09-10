@@ -1,11 +1,14 @@
 class Piece:
 
-    def __init__(self, color: str, col: int, row: int):
+    def __init__(self, color: str, col: int, row: int,board):
         self.color = color
         self.col = col
         self.row = row  
         self.name = None
         self.isPicked = False
+        self.board = board
+
+        
 
     def get_color(self):
         return self.color
@@ -35,7 +38,7 @@ class Piece:
         # Ваша логика проверки допустимости хода
         if self.is_valid_move(board_logic, new_col, new_row):
             # Переместить фигуру на новую позицию
-            self.set_position(new_col, new_row)
+            self.board.set_position(new_col, new_row)
             return True
         else:
             return False
@@ -52,8 +55,8 @@ class Piece:
 
 class Pawn(Piece):
 
-    def __init__(self, color: str, col: int, row: int):
-        super().__init__(color, col, row)
+    def __init__(self, color: str, col: int, row: int, board):
+        super().__init__(color, col, row, board)
 
     def movement(self):
         moves = []
@@ -78,10 +81,10 @@ class Pawn(Piece):
             return "images/blackPawn.png"
         
     def is_valid_move(self, piece_to_move, new_col, new_row):
-        current_col, current_row = piece_to_move.get_piece_coordinates()
-        piece_color = piece_to_move.get_color()
+        current_col, current_row = self.get_piece_coordinates()
+        piece_color = self.get_color()
 
-        for piece, (col, row) in self.pieces.items():
+        for piece, (col, row) in self.board.pieces.items():
             # Перевірте, чи цільовий квадрат зайнятий іншою фігурою того ж кольору.
             if col == new_col and row == new_row and piece.get_color() == piece_color:
                 return False
@@ -127,8 +130,8 @@ class Pawn(Piece):
 
 class Knight(Piece):
 
-    def __init__(self, color: str, col: int, row: int):
-        super().__init__(color, col, row)
+    def __init__(self, color: str, col: int, row: int, board):
+        super().__init__(color, col, row, board)
 
     def movement(self):
         moves = [
@@ -149,7 +152,7 @@ class Knight(Piece):
         current_col, current_row = self.get_piece_coordinates()
         piece_color = self.get_color()
 
-        for piece, (col, row) in board_logic.pieces.items():
+        for piece, (col, row) in self.board.pieces.items():
             # Перевірте, чи цільовий квадрат зайнятий іншою фігурою того ж кольору.
             if col == new_col and row == new_row and piece.get_color() == piece_color:
                 return False
@@ -171,8 +174,8 @@ class Knight(Piece):
 
 class Bishop(Piece):
 
-    def __init__(self, color: str, col: int, row: int):
-        super().__init__(color, col, row)
+    def __init__(self, color: str, col: int, row: int, board):
+        super().__init__(color, col, row, board)
 
     def movement(self):
         moves = set() 
@@ -213,8 +216,8 @@ class Bishop(Piece):
             return "images/blackBishop.png"
         
     def is_valid_move(self, piece_to_move, new_col, new_row):
-        current_col, current_row = piece_to_move.get_piece_coordinates()
-        piece_color = piece_to_move.get_color()
+        current_col, current_row = self.get_piece_coordinates()
+        piece_color = self.get_color()
 
         if abs(current_col - new_col) == abs(current_row - new_row):
             col_step = 1 if new_col > current_col else -1
@@ -233,8 +236,8 @@ class Bishop(Piece):
 
 class Rook(Piece):
 
-    def __init__(self, color: str, col: int, row: int):
-        super().__init__(color, col, row)
+    def __init__(self, color: str, col: int, row: int, board):
+        super().__init__(color, col, row, board)
 
     def movement(self):
         moves = []
@@ -254,10 +257,10 @@ class Rook(Piece):
             return "images/blackRook.png"
         
     def is_valid_move(self, piece_to_move, new_col, new_row):
-        current_col, current_row = piece_to_move.get_piece_coordinates()
-        piece_color = piece_to_move.get_color()
+        current_col, current_row = self.get_piece_coordinates()
+        piece_color = self.get_color()
 
-        for piece, (col, row) in self.pieces.items():
+        for piece, (col, row) in self.board.pieces.items():
             # Перевірте, чи цільовий квадрат зайнятий іншою фігурою того ж кольору.
             if col == new_col and row == new_row and piece.get_color() == piece_color:
                 return False
@@ -279,8 +282,8 @@ class Rook(Piece):
 
 class Queen(Piece):
 
-    def __init__(self, color: str, col: int, row: int):
-        super().__init__(color, col, row)
+    def __init__(self, color: str, col: int, row: int, board):
+        super().__init__(color, col, row, board)
 
     def movement(self):
         moves = set()
@@ -330,8 +333,8 @@ class Queen(Piece):
             return "images/blackQueen.png"
         
     def is_valid_move(self, piece_to_move, new_col, new_row):
-        current_col, current_row = piece_to_move.get_piece_coordinates()
-        piece_color = piece_to_move.get_color()
+        current_col, current_row = self.get_piece_coordinates()
+        piece_color = self.get_color()
 
         for piece, (col, row) in self.pieces.items():
             # Перевірте, чи цільовий квадрат зайнятий іншою фігурою того ж кольору.
@@ -367,8 +370,8 @@ class Queen(Piece):
 
 class King(Piece):
 
-    def __init__(self, color: str, col: int, row: int):
-        super().__init__(color, col, row)
+    def __init__(self, color: str, col: int, row: int, board):
+        super().__init__(color, col, row, board)
 
     def movement(self):
         moves = [
@@ -386,8 +389,8 @@ class King(Piece):
             return "images/blackKing.png"
         
     def is_valid_move(self, piece_to_move, new_col, new_row):
-        current_col, current_row = piece_to_move.get_piece_coordinates()
-        piece_color = piece_to_move.get_color()
+        current_col, current_row = self.get_piece_coordinates()
+        piece_color = self.get_color()
 
         for piece, (col, row) in self.pieces.items():
             # Перевірте, чи цільовий квадрат зайнятий іншою фігурою того ж кольору.
