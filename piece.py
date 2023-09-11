@@ -45,9 +45,9 @@ class Piece:
         
     def move_piece(self, piece_to_move, new_col, new_row):
         # Проверяем, допустим ли такой ход
-        if piece_to_move.is_valid_move(self, new_col, new_row):
+        if self.is_valid_move(self, new_col, new_row):
             # Выполняем перемещение фигуры
-            piece_to_move.move(self, new_col, new_row)
+            self.move(self, new_col, new_row)
             return True
         else:
             return False
@@ -408,3 +408,12 @@ class King(Piece):
         
         return True
 
+class EmptyCell(Piece):
+    def __init__(self, row, col, board):
+        super().__init__(None, row, col, board)  # None означает, что у пустой клетки нет цвета
+
+    def is_valid_move(self, board_logic, new_col, new_row):
+        return True
+
+    def get_image_path(self):
+        return None  # Возвращаем None, так как у пустой клетки нет изображения
