@@ -76,19 +76,19 @@ class ChessBoardGUI:
     def piece_clicked(self, event, row, col):
         selected_piece = self.get_piece_at(row, col)  # Получить фигуру на выбранной клетке
 
-        print(row,col, " ",selected_piece)
+        print("Selected piece -", selected_piece)
         
         if selected_piece and not isinstance(selected_piece, EmptyCell):  # Используйте явное сравнение с None
             if selected_piece.get_color() == self.current_player:
                 self.selected_piece = selected_piece
-                print("Selected piece -", self.selected_piece.get_type())
+                # print("Selected piece -", self.selected_piece.get_type())
         else:
             target_coordinates = (row, col)  # Координаты выбранной пустой клетки
             print(target_coordinates)
             if self.selected_piece:
-                print(2)
                 # Если есть выбранная фигура, попытайтесь выполнить ход
-                if self.selected_piece.move(self, target_coordinates[0], target_coordinates[1]):
+                if self.selected_piece.move(target_coordinates[0], target_coordinates[1]):
+                    print("Move сработало")
                     self.selected_piece = None
                     self.current_player = "black" if self.current_player == "white" else "white"
                     print("Selected piece - None")
@@ -96,6 +96,8 @@ class ChessBoardGUI:
                     print("Invalid move")
             else:
                 print("No piece on this square")
+            
+        self.update_board_visuals()
 
 
 
@@ -263,20 +265,22 @@ class ChessBoardGUI:
     #     return True
     
     
-    def move(self, board_logic, new_col, new_row):
+    def move(self, board_logic, new_row, new_col):
         # Ваша логика проверки допустимости хода
-        if self.is_valid_move(board_logic, new_col, new_row):
+        if self.is_valid_move(board_logic, new_row, new_col):
             # Переместить фигуру на новую позицию
-            self.set_position(new_col, new_row)
+            self.remove_piece(self)
+            self.set_position(new_row, new_col)
+            self.add_piece(self,new_row,new_col)
             return True
         else:
             return False
         
 
-    def set_position(self, new_col, new_row):
+    def set_position(self, new_row, new_col):
         # Установите новые координаты фигуры
-        self.col = new_col
         self.row = new_row
+        self.col = new_col
 
 
     def remove_piece(self, piece):
@@ -305,57 +309,57 @@ class ChessBoardGUI:
     #         return False
 
 
-    def update_board_visuals(self):
-        size = 50
-
-        for i in range(8):
-            for j in range(8):
-                x1, y1 = size * j, size * i
-                color = "#C0C0C0" if (i + j) % 2 == 0 else "#808080"
-                piece = self.get_piece_at(i, j)
-                image_path = None
-
-                if piece:
-                    image_path = piece.get_image_path()
-
-                button = self.buttons[i][j]
-                button.config(text="", borderwidth=0)
-
-                if image_path:
-                    image = PhotoImage(file=image_path)
-                    button.config(image=image)
-                    button.image = image
-
-        self.root.update()
-
     # def update_board_visuals(self):
     #     size = 50
 
     #     for i in range(8):
-    #         row_buttons = []
     #         for j in range(8):
     #             x1, y1 = size * j, size * i
     #             color = "#C0C0C0" if (i + j) % 2 == 0 else "#808080"
     #             piece = self.get_piece_at(i, j)
-    #             image_path = None  # Початкове значення для шляху зображення
+    #             image_path = None
 
     #             if piece:
-    #                 image_path = piece.get_image_path()  # Отримати шлях до зображення для фігури
+    #                 image_path = piece.get_image_path()
 
-    #             button = Button(master=self.canvas, text="", bg=color)
-    #             button.place(x=x1, y=y1, width=size, height=size)
+    #             button = self.buttons[i][j]
+    #             button.config(text="", borderwidth=0)
 
     #             if image_path:
-    #                 # Якщо є шлях до зображення, завантажте його і встановіть на кнопку
     #                 image = PhotoImage(file=image_path)
     #                 button.config(image=image)
-    #                 button.image = image  # Збережіть посилання на зображення, щоб воно не було очищено сміттям
+    #                 button.image = image
 
-    #             # Прив'яжіть обробник кліку до кнопки
-    #             button.bind("<Button-1>", 
-    #                         lambda event, row=i, col=j: self.piece_clicked(event, row, col))
-    #             row_buttons.append(button)
-    #         self.buttons.append(row_buttons)
+    #     self.root.update()
+
+    def update_board_visuals(self):
+        size = 50
+
+        for i in range(8):
+            row_buttons = []
+            for j in range(8):
+                x1, y1 = size * j, size * i
+                color = "#C0C0C0" if (i + j) % 2 == 0 else "#808080"
+                piece = self.get_piece_at(i, j)
+                image_path = None  # Початкове значення для шляху зображення
+
+                if piece:
+                    image_path = piece.get_image_path()  # Отримати шлях до зображення для фігури
+
+                button = Button(master=self.canvas, text="", bg=color)
+                button.place(x=x1, y=y1, width=size, height=size)
+
+                if image_path:
+                    # Якщо є шлях до зображення, завантажте його і встановіть на кнопку
+                    image = PhotoImage(file=image_path)
+                    button.config(image=image)
+                    button.image = image  # Збережіть посилання на зображення, щоб воно не було очищено сміттям
+
+                # Прив'яжіть обробник кліку до кнопки
+                button.bind("<Button-1>", 
+                            lambda event, row=i, col=j: self.piece_clicked(event, row, col))
+                row_buttons.append(button)
+            self.buttons.append(row_buttons)
     
 #     # Проверка таблицы TEST
 #     def print_board(self):
