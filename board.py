@@ -1,5 +1,6 @@
 from tkinter import Button, Canvas, PhotoImage, Tk
 from piece import Pawn, King, Knight, Bishop, Rook, Queen, Piece, EmptyCell
+# from logic import GameLogic
 
 
 class ChessBoardGUI:
@@ -74,8 +75,10 @@ class ChessBoardGUI:
 
     def piece_clicked(self, event, row, col):
         selected_piece = self.get_piece_at(row, col)  # Получить фигуру на выбранной клетке
+
+        print(row,col, " ",selected_piece)
         
-        if selected_piece:
+        if selected_piece and not isinstance(selected_piece, EmptyCell):  # Используйте явное сравнение с None
             if selected_piece.get_color() == self.current_player:
                 self.selected_piece = selected_piece
                 print("Selected piece -", self.selected_piece.get_type())
@@ -83,6 +86,7 @@ class ChessBoardGUI:
             target_coordinates = (row, col)  # Координаты выбранной пустой клетки
             print(target_coordinates)
             if self.selected_piece:
+                print(2)
                 # Если есть выбранная фигура, попытайтесь выполнить ход
                 if self.selected_piece.move(self, target_coordinates[0], target_coordinates[1]):
                     self.selected_piece = None
@@ -93,7 +97,6 @@ class ChessBoardGUI:
             else:
                 print("No piece on this square")
 
-        self.update_board_visuals()
 
 
 
@@ -126,7 +129,9 @@ class ChessBoardGUI:
             # EmptyCell
             for row in range(2, 6):  # Это для центральной части доски
                 for col in range(8):
-                    self.add_piece(EmptyCell(row, col,self), row, col)
+                    empty_cell = EmptyCell(row, col, self)
+                    empty_cell.set_value("empty")  # Установите значение пустой клетки
+                    self.add_piece(empty_cell, row, col)
 
     def initialize_board_buttons(self):
         size = 50
@@ -352,4 +357,27 @@ class ChessBoardGUI:
     #             row_buttons.append(button)
     #         self.buttons.append(row_buttons)
     
+#     # Проверка таблицы TEST
+#     def print_board(self):
+#         for row in range(8):
+#             for col in range(8):
+#                 piece = self.get_piece_at(row, col)
+#                 if piece:
+#                     if isinstance(piece, EmptyCell):
+#                         print(f"Row: {row}, Col: {col}, Value: {piece.get_value()}")
+#                     else:
+#                         print(f"Row: {row}, Col: {col}, Piece: {piece.get_type()} ({piece.get_color()})")
+#                 else:
+#                     print(f"Row: {row}, Col: {col}, Empty")
+
+# # TEST
+# if __name__ == "__main__":
+#     root = Tk()
+#     board_logic = GameLogic(None)
+#     chess_board = ChessBoardGUI(root, board_logic)
+#     chess_board.initialize_board()
+#     chess_board.print_board()
+#     root.mainloop()
+
+
 
