@@ -11,7 +11,7 @@ class ChessBoardGUI:
         self.board_logic = board_logic
         self.buttons = []  
         # self.button_images = []
-        self.active_images = []
+        # self.active_images = []
         self.selected_piece = None
         self.current_player = "white"
         self.pieces = {}
@@ -83,12 +83,11 @@ class ChessBoardGUI:
                 self.selected_piece = selected_piece
                 # print("Selected piece -", self.selected_piece.get_type())
         else:
-            target_coordinates = (row, col)  # Координаты выбранной пустой клетки
-            print(target_coordinates)
+            target_coordinates = (row, col)
+            print(target_coordinates)  # Координаты выбранной пустой клетки
             if self.selected_piece:
                 # Если есть выбранная фигура, попытайтесь выполнить ход
                 if self.selected_piece.move(target_coordinates[0], target_coordinates[1]):
-                    print("Move сработало")
                     self.selected_piece = None
                     self.current_player = "black" if self.current_player == "white" else "white"
                     print("Selected piece - None")
@@ -98,8 +97,6 @@ class ChessBoardGUI:
                 print("No piece on this square")
             
         self.update_board_visuals()
-
-
 
 
     def initialize_board(self):
@@ -143,31 +140,13 @@ class ChessBoardGUI:
             for j in range(8):
                 x1, y1 = size * j, size * i
                 color = "#C0C0C0" if (i + j) % 2 == 0 else "#808080"
-                piece = self.get_piece_at(i, j)
-                                
-                # def click_handler(event, i=i, j=j):
-                #     return self.piece_clicked(event, self.get_piece_at(i, j))
-                
+                # piece = self.get_piece_at(i, j)
                 button = Button(master=self.canvas, text="", bg=color)
                 button.place(x=x1, y=y1, width=size, height=size)
                 button.bind("<Button-1>", 
                             lambda event, row=i, col=j: self.piece_clicked(event, row, col))
                 row_buttons.append(button)
             self.buttons.append(row_buttons)
-
-
-    # def entered(self, event, x, y):
-    #     piece = self.board_logic.get_piece_at(x, y)
-            
-    #     if piece:
-    #         piece_info = f"Type: {piece.get_type()}, Color: {piece.get_color()}"
-    #         piece_cootdinates = f"xy{piece.get_piece_coordinates()}"
-    #         print(piece_cootdinates)
-    #         print(piece_info)
-    #     else:
-    #         print("No piece on this square")
-
-    #     return piece
     
 
     # def is_valid_move(self, piece_to_move, new_col, new_row):
@@ -298,16 +277,6 @@ class ChessBoardGUI:
         self.pieces[piece] = (row, col)
         self.board[row][col] = piece
 
-    
-    # def move_piece(self, piece_to_move, new_col, new_row):
-    #     # Проверяем, допустим ли такой ход
-    #     if piece_to_move.is_valid_move(self, new_col, new_row):
-    #         # Выполняем перемещение фигуры
-    #         piece_to_move.move(self, new_col, new_row)
-    #         return True
-    #     else:
-    #         return False
-
 
     # def update_board_visuals(self):
     #     size = 50
@@ -329,6 +298,15 @@ class ChessBoardGUI:
     #                 image = PhotoImage(file=image_path)
     #                 button.config(image=image)
     #                 button.image = image
+
+    #                 # Сохраните ссылку на изображение в объекте фигуры
+    #                 piece = self.get_piece_at(i, j)
+    #                 if piece:
+    #                     piece.set_image(image)
+    #             else:
+    #                 # Если нет изображения, очистите кнопку
+    #                 button.config(image=None)
+
 
     #     self.root.update()
 
