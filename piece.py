@@ -37,8 +37,8 @@ class Piece:
         else:
             return False
     
-    def remove_piece(self):
-        self.board.remove_piece(self)
+    def remove_piece(self,piece):
+        self.board.remove_piece(self,piece)
     
     def add_piece(self, new_row, new_col):
         self.board.add_piece(self, new_row, new_col)
@@ -46,6 +46,20 @@ class Piece:
     def set_position(self, new_row, new_col):
         self.row = new_row
         self.col = new_col
+
+    def is_valid_move(self, piece_to_move, new_row, new_col):
+        current_row, current_col = self.get_piece_coordinates()
+        piece_color = self.get_color()
+
+        possible_moves = self.movement()
+
+        if (new_row, new_col) in possible_moves:
+            for piece, (row, col) in self.board.pieces.items():
+                if row == new_row and col == new_col and piece.get_color() == piece_color:
+                    return False
+            return True
+
+        return False
 
 
 class Pawn(Piece):
@@ -80,22 +94,7 @@ class Pawn(Piece):
         if self.get_color() == "white":
             return "images/whitePawn.png"
         else:
-            return "images/blackPawn.png"
-        
-    def is_valid_move(self, piece_to_move, new_row, new_col):
-        current_row, current_col = self.get_piece_coordinates()
-        piece_color = self.get_color()
-
-        possible_moves = self.movement()
-
-        if (new_row, new_col) in possible_moves:
-            for piece, (row, col) in self.board.pieces.items():
-                if row == new_row and col == new_col and piece.get_color() == piece_color:
-                    return False
-            return True
-
-        return False
-
+            return "images/blackPawn.png"       
 
 
 class Knight(Piece):
@@ -119,20 +118,6 @@ class Knight(Piece):
         else:
             return "images/blackKnight.png"
         
-    def is_valid_move(self, board_logic, new_row, new_col):
-        current_col, current_row = self.get_piece_coordinates()
-        piece_color = self.get_color()
-
-        for piece, (row, col) in self.board.pieces.items():
-            if col == new_col and row == new_row and piece.get_color() == piece_color:
-                return False
-
-        possible_moves = self.movement()
-        if (new_row, new_col) in possible_moves:
-            return True
-
-        return False
-
 
 class Bishop(Piece):
 
@@ -202,16 +187,6 @@ class Rook(Piece):
             return "images/whiteRook.png"
         else:
             return "images/blackRook.png"
-        
-    def is_valid_move(self, piece_to_move, new_row, new_col):
-        current_row, current_col = self.get_piece_coordinates()
-        piece_color = self.get_color()
-
-        for piece, (row, col) in self.board.pieces.items():
-            if col == new_col and row == new_row and piece.get_color() == piece_color:
-                return False
-            
-        return (new_row, new_col) in self.movement()
 
 
 class Queen(Piece):
@@ -246,16 +221,6 @@ class Queen(Piece):
         else:
             return "images/blackQueen.png"
         
-    def is_valid_move(self, piece_to_move, new_row, new_col):
-        current_row, current_col = self.get_piece_coordinates()
-        piece_color = self.get_color()
-
-        for piece, (row, col) in self.board.pieces.items():
-            if col == new_col and row == new_row and piece.get_color() == piece_color:
-                return False
-
-        return (new_row, new_col) in self.movement()
-
 
 class King(Piece):
 
@@ -298,8 +263,8 @@ class King(Piece):
 
 
 class EmptyCell(Piece):
-    def __init__(self, row, col, board):
-        super().__init__(None, row, col, board)
+    def __init__(self, row=None, col=None, board=None):
+        super().__init__(None, None, None, None)
         self.value = "empty" 
 
     def get_value(self):
@@ -311,3 +276,5 @@ class EmptyCell(Piece):
     def get_image_path(self):
         return None
     
+test = Pawn("white",6,1,None)
+print(test.movement())

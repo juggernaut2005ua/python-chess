@@ -1,6 +1,6 @@
 from tkinter import Button, Canvas, PhotoImage, Tk
 from piece import Pawn, King, Knight, Bishop, Rook, Queen, Piece, EmptyCell
-# from logic import GameLogic
+from logic import GameLogic
 
 
 class ChessBoardGUI:
@@ -27,24 +27,26 @@ class ChessBoardGUI:
 
     def piece_clicked(self, event, row, col):
         selected_piece = self.get_piece_at(row, col)
-
-        print("Selected piece -", selected_piece)
         
-        if selected_piece and not isinstance(selected_piece, EmptyCell):  
+        if selected_piece and not isinstance(selected_piece, EmptyCell):
             if selected_piece.get_color() == self.current_player:
                 self.selected_piece = selected_piece
+            else:
+                # Удаляем фигуру, которую хотим взять, с доски
+                self.remove_piece(selected_piece)
+                self.board_logic.taking(self.selected_piece, selected_piece)
+                self.current_player = "black"
         else:
             target_coordinates = (row, col)
             if self.selected_piece:
                 if self.selected_piece.move(target_coordinates[0], target_coordinates[1]):
                     self.selected_piece = None
                     self.current_player = "black" if self.current_player == "white" else "white"
-                    print("Selected piece - None")
                 else:
                     print("Invalid move")
             else:
                 print("No piece on this square")
-            
+
         self.update_board_visuals()
 
 
