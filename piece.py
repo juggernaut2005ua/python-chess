@@ -7,27 +7,35 @@ class Piece:
         self.name = None
         self.board = board
 
+
     def set_image(self, image):
         self.image = image
+
 
     def get_image(self):
         return self.image
         
+
     def get_color(self):
         return self.color
     
+
     def move_possibility(self, row, col):
         return 0 <= row < 8 and 0 <= col < 8
+
 
     def get_piece_coordinates(self):
         return self.row, self.col
     
+
     def get_image_path(self):
         raise NotImplementedError("Subclasses must implement get_image_path")
+
 
     def get_type(self):
         return self.__class__.__name__
         
+
     def move(self, new_row, new_col):
         if self.is_valid_move(self, new_row, new_col):
             self.board.remove_piece(self)  
@@ -37,15 +45,19 @@ class Piece:
         else:
             return False
     
+
     def remove_piece(self,piece):
         self.board.remove_piece(self,piece)
     
+
     def add_piece(self, new_row, new_col):
         self.board.add_piece(self, new_row, new_col)
     
+
     def set_position(self, new_row, new_col):
         self.row = new_row
         self.col = new_col
+
 
     def is_valid_move(self, piece_to_move, new_row, new_col):
         current_row, current_col = self.get_piece_coordinates()
@@ -66,6 +78,7 @@ class Pawn(Piece):
 
     def __init__(self, color: str, row: int, col: int, board):
         super().__init__(color, row, col, board)
+
 
     def movement(self):
         moves = []
@@ -90,6 +103,7 @@ class Pawn(Piece):
 
         return moves
 
+
     def get_image_path(self):
         if self.get_color() == "white":
             return "images/whitePawn.png"
@@ -102,6 +116,7 @@ class Knight(Piece):
     def __init__(self, color: str, row: int, col: int, board):
         super().__init__(color, row, col, board)
 
+
     def movement(self):
         moves = [
             (self.row - 2, self.col + 1), (self.row - 1, self.col + 2),
@@ -111,6 +126,7 @@ class Knight(Piece):
         ]
 
         return [(row, col) for row, col in moves if self.move_possibility(row, col)]
+
 
     def get_image_path(self):
         if self.get_color() == "white":
@@ -123,6 +139,7 @@ class Bishop(Piece):
 
     def __init__(self, color: str, row: int, col: int, board):
         super().__init__(color, row, col, board)
+
 
     def movement(self):
         moves = set()
@@ -139,12 +156,14 @@ class Bishop(Piece):
                     break
         return list(moves)
 
+
     def get_image_path(self):
         if self.get_color() == "white":
             return "images/whiteBishop.png"
         else:
             return "images/blackBishop.png"
         
+
     def is_valid_move(self, piece_to_move, new_row, new_col):
         current_row, current_col = self.get_piece_coordinates()
         piece_color = self.get_color()
@@ -171,6 +190,7 @@ class Rook(Piece):
     def __init__(self, color: str, row: int, col: int, board):
         super().__init__(color, row, col, board)
 
+
     def movement(self):
         moves = []
         for col in range(8):
@@ -181,6 +201,7 @@ class Rook(Piece):
             if row != self.row:
                 moves.append((row, self.col))
         return moves
+
 
     def get_image_path(self):
         if self.get_color() == "white":
@@ -193,6 +214,7 @@ class Queen(Piece):
 
     def __init__(self, color: str, row: int, col: int, board):
         super().__init__(color, row, col, board)
+
 
     def movement(self):
         moves = set()
@@ -215,6 +237,7 @@ class Queen(Piece):
 
         return list(moves)
 
+
     def get_image_path(self):
         if self.get_color() == "white":
             return "images/whiteQueen.png"
@@ -227,6 +250,7 @@ class King(Piece):
     def __init__(self, color: str, row: int, col: int, board):
         super().__init__(color, row, col, board)
 
+
     def movement(self):
         moves = [
             (self.row - 1, self.col), (self.row - 1, self.col + 1),
@@ -236,12 +260,14 @@ class King(Piece):
         ]
         return [move for move in moves if self.move_possibility(*move)]
 
+
     def get_image_path(self):
         if self.get_color() == "white":
             return "images/whiteKing.png"
         else:
             return "images/blackKing.png"
         
+
     def is_valid_move(self, piece_to_move, new_row, new_col):
         current_row, current_col = self.get_piece_coordinates()
         piece_color = self.get_color()
@@ -263,18 +289,20 @@ class King(Piece):
 
 
 class EmptyCell(Piece):
+
     def __init__(self, row=None, col=None, board=None):
         super().__init__(None, None, None, None)
         self.value = "empty" 
 
+
     def get_value(self):
         return self.value
+
 
     def set_value(self, new_value):
         self.value = new_value
 
+
     def get_image_path(self):
         return None
     
-test = Pawn("white",6,1,None)
-print(test.movement())

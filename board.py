@@ -1,6 +1,6 @@
-from tkinter import Button, Canvas, PhotoImage, Tk
-from piece import Pawn, King, Knight, Bishop, Rook, Queen, Piece, EmptyCell
-from logic import GameLogic
+from tkinter import Button, Canvas, PhotoImage
+from piece import Pawn, King, Knight, Bishop, Rook, Queen, EmptyCell
+
 
 
 class ChessBoardGUI:
@@ -11,7 +11,6 @@ class ChessBoardGUI:
         self.board_logic = board_logic
         self.buttons = []  
         self.selected_piece = None
-        self.current_player = "white"
         self.pieces = {}
         self.board = [[None for _ in range(8)] for _ in range(8)] 
         self.current_player = "white"
@@ -22,7 +21,6 @@ class ChessBoardGUI:
         self.canvas.pack()
 
         self.initialize_board_buttons()
-        print("Selected piece -",self.selected_piece)
     
 
     def piece_clicked(self, event, row, col):
@@ -31,11 +29,12 @@ class ChessBoardGUI:
         if selected_piece and not isinstance(selected_piece, EmptyCell):
             if selected_piece.get_color() == self.current_player:
                 self.selected_piece = selected_piece
+
+                if self.board_logic.check():
+                    print("Check")
             else:
-                # Удаляем фигуру, которую хотим взять, с доски
-                self.remove_piece(selected_piece)
+                print(self.selected_piece, selected_piece)
                 self.board_logic.taking(self.selected_piece, selected_piece)
-                self.current_player = "black"
         else:
             target_coordinates = (row, col)
             if self.selected_piece:
@@ -48,6 +47,7 @@ class ChessBoardGUI:
                 print("No piece on this square")
 
         self.update_board_visuals()
+
 
 
     def initialize_board(self):
@@ -77,10 +77,10 @@ class ChessBoardGUI:
             self.add_piece(Queen("white",7,3,self),7,3)
             self.add_piece(Queen("black",0,3,self),0,3)
             # EmptyCell
-            for row in range(2, 6):  # Это для центральной части доски
+            for row in range(2, 6):  
                 for col in range(8):
                     empty_cell = EmptyCell(row, col, self)
-                    empty_cell.set_value("empty")  # Установите значение пустой клетки
+                    empty_cell.set_value("empty")
                     self.add_piece(empty_cell, row, col)
 
     def initialize_board_buttons(self):
@@ -100,19 +100,18 @@ class ChessBoardGUI:
             self.buttons.append(row_buttons)
     
     def move(self, board_logic, new_row, new_col):
-        # Ваша логика проверки допустимости хода
         if self.is_valid_move(board_logic, new_row, new_col):
-            # Переместить фигуру на новую позицию
             self.remove_piece(self)
+            
             self.set_position(new_row, new_col)
             self.add_piece(self,new_row,new_col)
+            self.update_board_visuals()
             return True
         else:
             return False
         
 
     def set_position(self, new_row, new_col):
-        # Установите новые координаты фигуры
         self.row = new_row
         self.col = new_col
 
@@ -133,65 +132,31 @@ class ChessBoardGUI:
         self.board[row][col] = piece
 
 
-    # def update_board_visuals(self):
-    #     size = 50
-
-    #     for i in range(8):
-    #         for j in range(8):
-    #             x1, y1 = size * j, size * i
-    #             color = "#C0C0C0" if (i + j) % 2 == 0 else "#808080"
-    #             piece = self.get_piece_at(i, j)
-    #             image_path = None
-
-    #             if piece:
-    #                 image_path = piece.get_image_path()
-
-    #             button = self.buttons[i][j]
-    #             button.config(text="", borderwidth=0)
-
-    #             if image_path:
-    #                 image = PhotoImage(file=image_path)
-    #                 button.config(image=image)
-    #                 button.image = image
-
-    #                 # Сохраните ссылку на изображение в объекте фигуры
-    #                 piece = self.get_piece_at(i, j)
-    #                 if piece:
-    #                     piece.set_image(image)
-    #             else:
-    #                 # Если нет изображения, очистите кнопку
-    #                 button.config(image=None)
-
-
-    #     self.root.update()
-
     def update_board_visuals(self):
         size = 50
 
         for i in range(8):
-            row_buttons = []
             for j in range(8):
                 x1, y1 = size * j, size * i
                 color = "#C0C0C0" if (i + j) % 2 == 0 else "#808080"
                 piece = self.get_piece_at(i, j)
-                image_path = None  # Початкове значення для шляху зображення
+                image_path = None
 
                 if piece:
-                    image_path = piece.get_image_path()  # Отримати шлях до зображення для фігури
+                    image_path = piece.get_image_path()
 
-                button = Button(master=self.canvas, text="", bg=color)
-                button.place(x=x1, y=y1, width=size, height=size)
+                button = self.buttons[i][j]
+                button.config(text="", borderwidth=0)
 
                 if image_path:
-                    # Якщо є шлях до зображення, завантажте його і встановіть на кнопку
                     image = PhotoImage(file=image_path)
                     button.config(image=image)
-                    button.image = image  # Збережіть посилання на зображення, щоб воно не було очищено сміттям
+                    button.image = image
 
-                # Прив'яжіть обробник кліку до кнопки
-                button.bind("<Button-1>", 
-                            lambda event, row=i, col=j: self.piece_clicked(event, row, col))
-                row_buttons.append(button)
-            self.buttons.append(row_buttons)
-
-
+                    # Сохраните ссылку на изображение в объекте фигуры
+                    piece = self.get_piece_at(i, j)
+                    if piece:
+                        piece.set_image(image)
+                else:
+                    # Если нет изображения, очистите кнопку
+                    button.config(image="")
